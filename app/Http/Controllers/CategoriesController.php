@@ -64,7 +64,8 @@ class CategoriesController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = Category::find($id);
+        return view('categories.create')->with('category',$category);
     }
 
     /**
@@ -74,9 +75,15 @@ class CategoriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(categoryRequest $request, $id)
     {
-        //
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->save();
+
+        session()->flash('success','Category updated succesfully');
+        
+        return redirect()->route('categories.index');
     }
 
     /**
@@ -87,6 +94,11 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::find($id);
+        $category->delete();
+
+        session()->flash('success','Category deleted succesfully');
+        
+        return redirect()->route('categories.index');
     }
 }
