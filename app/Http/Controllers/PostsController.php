@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Post;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UpdatePostRequest;
 use Carbon\Carbon;
 
 class PostsController extends Controller
@@ -67,8 +67,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        $post = Post::find($id);
-        return view('categories.create')->with('post',$post);
+       
     }
 
     /**
@@ -79,7 +78,8 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        //
+         $post = Post::find($id);
+         return view('posts.create')->with('post',$post);
     }
 
     /**
@@ -89,9 +89,34 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdatePostRequest $request, $id)
     {
-        //
+        //upload the image
+        $post = Post::find($id);
+        
+        if($request->hasFile('image'))
+        {
+            $image = $request->file('image')->store('posts');
+            // delete previous file
+            $post->deleteImage();
+            $post->image = $image;
+        }
+        
+        $published_at = NULL;
+        if($request->published_at)
+        {
+            $published_at = Carbon::parse($request->published_at)->format('Y-m-d H:i:s');
+        }
+
+        $post->title = $request->title;
+        $post->description = $request->description;
+        $post->content = $request->content;
+        $post->published_at = $request->published_at;
+        $post->save();
+
+        session()->flash('success','Posts updated succesfully');
+        
+        return redirect()->route('posts.index');
     }
 
     /**
@@ -106,7 +131,7 @@ class PostsController extends Controller
 
         if($post->trashed())
         {
-            Storage::delete($post->image);
+            $post->deleteImage();
             $post->forceDelete();
             session()->flash('success','Post deleted succesfully');
         }
@@ -129,7 +154,21 @@ class PostsController extends Controller
      */
     public function trashed()
     {
-        $trashed = Post::withTrashed()->get();
+        $trashed = Post::onlyTrashed()->get();
         return view('posts.index')->with('posts',$trashed);
+    }
+
+    /**
+     * restore a specific post
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function restore($id)
+    {   
+        $post = Post::withTrashed()->where('id',$id)->firstorFail();
+        $post->restore();
+
+        session()->flash('success','Post restored succesfully');
+        return redirect()->back();
     }
 }
