@@ -14,6 +14,7 @@
             <table class="table">
                 <thead>
                    <th>Image</th>
+                   <th>Category</th>
                    <th>Title</th>
                    <th></th>
                    <th></th>
@@ -28,6 +29,9 @@
 
                              <td>
                                 {{ $post->title }}
+                            </td>
+                             <td>
+                                {{ $post->category->name }}
                             </td>
                             @if(($post->trashed()))
                             <td>

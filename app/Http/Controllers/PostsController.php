@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Category;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
 use App\Http\Requests\UpdatePostRequest;
@@ -10,6 +11,11 @@ use Carbon\Carbon;
 
 class PostsController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('verifyCategoryCount')->only(['create','store']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -27,7 +33,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        return view('posts.create')->with('catagories',Category::all());;
     }
 
     /**
@@ -52,6 +58,7 @@ class PostsController extends Controller
             'content' => $request->content,
             'published_at' => $published_at,
             'image' => $image,
+            'category_id' => $request->category
         ]);
 
         session()->flash('success','Post created succesfully');
@@ -79,7 +86,7 @@ class PostsController extends Controller
     public function edit($id)
     {
          $post = Post::find($id);
-         return view('posts.create')->with('post',$post);
+         return view('posts.create')->with('post',$post)->with('catagories',Category::all());;;
     }
 
     /**

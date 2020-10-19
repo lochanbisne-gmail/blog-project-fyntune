@@ -49,6 +49,21 @@
                     <label for="image">Image</label>
                     <input type="file" id="image" class="form-control" name="image" value="{{ isset($post) ? $post->published_at : ''}}">
                 </div>
+                   <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" class="form-control" name="category">
+                        <option value=""></option>
+                        @foreach($catagories as $category)
+                            <option value="{{$category->id}}"  
+                                @if(isset($post))
+                                    @if($category->id == $post->category_id)  
+                                        selected
+                                    @endif
+                                @endif
+                            > {{$category->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
                 <div class="form-group">
                     <button class="btn btn-success">{{ isset($post) ? 'Update Post' : 'Create Post'}}</button>
                 </div>
