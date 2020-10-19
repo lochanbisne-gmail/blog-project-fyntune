@@ -33,4 +33,7 @@ Route::middleware(['auth'])->group(function(){
 	Route::put('restore-post/{post}', 'PostsController@restore')->name('restore.post');
 
 	Route::resource('tags','TagsController');
+
+	Route::get('view-posts', 'PostsController@viewPost')->name('view-posts.index');
+	Route::post('search-posts', 'PostsController@searchPost')->name('search-posts');
 });

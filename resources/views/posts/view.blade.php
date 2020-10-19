@@ -1,62 +1,93 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex justify-content-end mb-2">
-    <a href="{{route('posts.create')}}" class="btn btn-success">Add Post</a>
-    </div>
-    
+    <form id="search_form">
+       <div class="">
+         <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" class="form-control" name="category">
+                            <option value=""></option>
+                            @foreach($catagories as $category)
+                                <option value="{{$category->id}}" > {{$category->name}}</option>
+                            @endforeach
+                        </select>
+         </div>
+         <div class="form-group">
+             <button type="button" class="btn btn-success" id="search_button">Search</button>
+        </div>
+        </div>
+    </form>
     <div class="card card-default">
         <div class="card-header">
             Posts
         </div>
         <div class="card-body">
-         @if($posts->count() > 0)
-            <table class="table">
+            <table class="table" id="post_table">
                 <thead>
                    <th>Image</th>
                    <th>Title</th>
-                   <th></th>
-                   <th></th>
+                   <th>Description</th>
+                   <th>Content</th>
                 </thead>
                 <tbody>
-                    @foreach ($posts as $post)
-                        <tr>
-                            <td>
-                                <img src="{{ asset('storage/'.$post->image) }}" width="60px" height="60px" alt="Post Image">
-                                
-                            </td>
-
-                             <td>
-                                {{ $post->title }}
-                            </td>
-                            @if(($post->trashed()))
-                            <td>
-                                <form action="{{route('restore.post',$post->id)}}" method="POST">
-                                    @csrf
-                                    @method('PUT')
-                                    <button class="btn btn-info btn-sm">Restore</button>
-                                </form>
-                            </td>
-                            @else
-                             <td>
-                                <a href="{{ route('posts.edit',$post->id) }}" class="btn btn-info btn-sm">Edit</a>
-                            </td>
-                            @endif
-                            <td>
-                                <form action="{{route('posts.destroy',$post->id)}}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-danger btn-sm">{{ $post->trashed() ? 'Delete' : 'Trash' }}</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
                 </tbody>
             </table>
-         @else
-            <h3 class="text-center">No Posts Yet!</h3>
-         @endif
 
         </div>
     </div>
+@endsection
+
+@section('css')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" />
+@endsection
+
+@section('scripts')
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+  
+  getData();
+  function getData(){
+    $('#post_table').DataTable().destroy();
+    $('#post_table').DataTable({
+        processing: true,
+        serverSide: true,
+        destroy: true,
+        "filter": false,
+        "bSort" : false,
+        sorting : false,
+        "bLengthChange": false,
+        pageLength : 5,
+        responsive : true,
+        "searching": false,
+        "info"     : false,
+        "language": {
+          "paginate": {
+            "previous": "Prev"
+          }
+        },
+
+       ajax: {
+          'url' : 'search-posts',
+          'type': 'POST',
+          'data':{
+            'category_id':$('#category').val(),
+            '_token':'{{ csrf_token() }}'
+          },
+        },
+       columns: [
+            { name : 'incoterm', data: null, render:function(data, type, row){
+                return `<img src="{{ asset('storage/`+row.image+`') }}" width="60px" height="60px" alt="Post Image">`;
+             }},
+           { data: 'title', name: 'title'},
+           { data: 'description', name: 'description'},
+           { data: 'content', name: 'content'},
+          
+       ],
+  });
+}
+
+$('#search_form').click(function(){
+     getData();
+});
+</script>
 @endsection

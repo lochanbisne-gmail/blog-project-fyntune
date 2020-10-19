@@ -179,5 +179,37 @@ class PostsController extends Controller
         return redirect()->back();
     }
 
+
+    /**
+     * Display a view of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function viewPost(Request $request)
+    {
+        
+        return view('posts.view')->with('catagories',Category::all());
+    }
+
+
+    /**
+     * Display a view of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function searchPost()
+    {
+        $category_id = $_REQUEST['category_id']??'';
+        if($category_id)
+        {
+            $post = Post::where('category_id',$category_id)->where('published_at','<=',date('Y-m-d H:i:s'))->get();
+        }
+        else
+        {
+           $post = Post::where('published_at','<=',date('Y-m-d H:i:s'))->get();
+        }
+        return ['data'=>$post, 'recordsFiltered'=>count($post), 'recordsTotal'=>count($post)];
+    }
+
    
 }

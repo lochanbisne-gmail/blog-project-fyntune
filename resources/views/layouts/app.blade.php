@@ -27,7 +27,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                    {{ config('app.name', 'My Blog') }}
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
@@ -90,6 +90,7 @@
                     @endif
                     <div class="row">
                         <div class="col-md-4">
+                            @if(Auth::user()->admin == 1)
                             <ul class="list-group">
                                 <li class="list-group-item">
                                     <a href="{{route('posts.index')}}">Posts</a>
@@ -97,12 +98,18 @@
                                  <li class="list-group-item">
                                  <a href="{{route('categories.index')}}">Categories</a>
                                 </li>
-                            </ul>
-                            <ul class="list-group mt-5">
-                                <li class="list-group-item">
-                                    <a href="{{route('trashed-posts.index')}}">Trashed Posts</a>
+                                 <li class="list-group-item">
+                                    <a href="{{route('view-posts.index')}}">View Posts</a>
                                 </li>
                             </ul>
+                            @else
+                            <ul class="list-group">
+                                 <li class="list-group-item">
+                                    <a href="{{route('view-posts.index')}}">View Posts</a>
+                                </li>
+                            </ul>
+                            @endif
+                            
                         </div> 
                         <div class="col-md-8">
                              @yield('content')
