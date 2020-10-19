@@ -171,4 +171,6 @@ class PostsController extends Controller
         session()->flash('success','Post restored succesfully');
         return redirect()->back();
     }
+
+   
 }
